@@ -1,11 +1,22 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Link } from "react-router-dom";
 import { Row, Col, Image, ListGroup, Card, Button } from "react-bootstrap";
 import Rating from "../components/Rating";
-import products from "../products";
 // match A match object contains information about how a <Route path> matched the URL.
 const ProductScreen = ({ match }) => {
-  const product = products.find((p) => p._id === match.params.id);
+  const [product, setProduct] = useState({});
+  //make GET request
+  useEffect(() => {
+    const fetchProduct = async () => {
+      const res = await axios.get(`/api/products/${match.params.id}`);
+      //can be destructured as const {data}
+      setProduct(res.data);
+    };
+    //since we want to use async/await inside useEffect, we need to create a separate async fn inside useEffect and call that function
+    fetchProduct();
+    //React Hook useEffect has a missing dependency: 'match.params.id' so we add match to the dependency array
+  }, [match]);
   return (
     <>
       <Link className="btn btn-dark my-3" to="/">
