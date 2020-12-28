@@ -3,12 +3,14 @@
   "version": "1.0.0",
   "description": "MERN app",
   "main": "server.js",
-  "type":"module",
+  "type": "module",
   "scripts": {
     "start_dev": "node backend/server.js",
     "server": "nodemon backend/server",
     "client": "npm start --prefix frontend",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "data:import":"node backend/seeder",
+    "data:destroy":"node backend/seeder -d"
   },
   "repository": {
     "type": "git",
@@ -21,9 +23,12 @@
   },
   "homepage": "https://github.com/thewebdevgeek/mern-stack-projects#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "colors": "^1.4.0",
     "concurrently": "^5.3.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "mongoose": "^5.11.8",
     "nodemon": "^2.0.6"
   }
 }
