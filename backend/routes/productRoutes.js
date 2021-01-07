@@ -10,6 +10,8 @@ router.get(
   "/",
   asyncHandler(async (req, res) => {
     const products = await Product.find({});
+    // //simulate error
+    // throw new Error("simulated error!!!");
     res.json(products);
   })
 );
@@ -20,6 +22,7 @@ router.get(
   "/:id",
   asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
+    console.log("product-backend", product);
     if (product) {
       res.json(product);
     } else {
