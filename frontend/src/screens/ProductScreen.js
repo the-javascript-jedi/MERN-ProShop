@@ -1,7 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Row, Col, Image, ListGroup, Card, Button } from "react-bootstrap";
+import {
+  Row,
+  Col,
+  Image,
+  ListGroup,
+  Card,
+  Button,
+  Form,
+} from "react-bootstrap";
 // listProductDetails action
 import { listProductDetails } from "../actions/productActions";
 import Rating from "../components/Rating";
@@ -9,9 +17,11 @@ import Loader from "../components/Loader";
 import Message from "../components/Message";
 
 // match A match object contains information about how a <Route path> matched the URL.
-const ProductScreen = ({ match }) => {
+const ProductScreen = ({ history, match }) => {
+  // state hook
+  const [qty, setQty] = useState(1);
   const dispatch = useDispatch();
-  // use the useSelectork hook to get the data from the redux state
+  // use the useSelector hook to get the data from the redux state
   const productDetails = useSelector((state) => state.productDetails);
 
   const { loading, error, product } = productDetails;
@@ -19,6 +29,12 @@ const ProductScreen = ({ match }) => {
     // dispatch an action to listProductDetails action with the id of the product
     dispatch(listProductDetails(match.params.id));
   }, [dispatch, match]);
+  // event handlers below useEffect
+  const addToCartHandler = () => {
+    // navigate to Cart page
+    history.push(`/cart/${match.params.id}?qty=${qty}`);
+  };
+
   return (
     <>
       <Link className="btn btn-dark my-3" to="/">
@@ -68,8 +84,34 @@ const ProductScreen = ({ match }) => {
                     </Col>
                   </Row>
                 </ListGroup.Item>
+                {/* if product is in stock show the quantity dropdown*/}
+                {product.countInStock > 0 && (
+                  <ListGroup.Item>
+                    <Row>
+                      <Col>
+                        {/* Quantity Dropdown */}
+                        <Form.Control
+                          as="select"
+                          value={qty}
+                          onChange={(e) => setQty(e.target.value)}
+                        >
+                          {/*y=[Array(5)]->create new array with 5 values using array keyword */}
+                          {/* The keys() method returns a new Array Iterator object that contains the keys for each index in the array */}
+                          {/* .keys will display array values with number of values - eg [0,1,2,3,4,5] */}
+                          {[...Array(product.countInStock).keys()].map((x) => (
+                            <option key={x + 1} value={x + 1}>
+                              {x + 1}
+                            </option>
+                          ))}
+                        </Form.Control>
+                      </Col>
+                    </Row>
+                  </ListGroup.Item>
+                )}
+                {/* add to cart button */}
                 <ListGroup.Item>
                   <Button
+                    onClick={addToCartHandler}
                     className="btn-block"
                     type="button"
                     disabled={product.countInStock === 0}

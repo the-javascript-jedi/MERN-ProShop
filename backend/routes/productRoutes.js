@@ -22,7 +22,7 @@ router.get(
   "/:id",
   asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
-    console.log("product-backend", product);
+    // console.log("product-backend", product);
     if (product) {
       res.json(product);
     } else {
