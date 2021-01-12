@@ -7,7 +7,7 @@ import User from "../models/userModel.js";
 //@route POST /api/users/login
 //@access Public
 const authUser = asyncHandler(async (req, res) => {
-  // when we set a form and send from the front end we can access the
+  // when we set a form and send from the front end we can access the body of request
   const { email, password } = req.body;
   // find user one document which matches the email
   const user = await User.findOne({ email });
@@ -29,4 +29,23 @@ const authUser = asyncHandler(async (req, res) => {
     throw new Error("Invalid email or password");
   }
 });
-export { authUser };
+//@desc  Get user profile
+//@route GET /api/users/profile
+//@access Private
+const getUserProfile = asyncHandler(async (req, res) => {
+  //find the user by id
+  const user = await User.findById(req.user._id);
+  // res.send("Success");
+  if (user) {
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      isAdmin: user.isAdmin,
+    });
+  } else {
+    res.status(401);
+    throw new Error("Invalid Email or password");
+  }
+});
+export { authUser, getUserProfile };
