@@ -33,7 +33,7 @@ const RegisterScreen = ({ location, history }) => {
       setMessageFromState("Passwords do not match");
     } else {
       // DISPATCH REGISTER Action
-      dispatchHook(nameFromState, emailFromState, passwordFromState);
+      dispatchHook(register(nameFromState, emailFromState, passwordFromState));
     }
   };
   return (
