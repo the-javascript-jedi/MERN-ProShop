@@ -139,6 +139,10 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
     const { data } = await axios.put(`/api/users/profile`, user, config);
     // after register dispatch the USER_UPDATE_PROFILE_SUCCESS
     dispatch({ type: USER_UPDATE_PROFILE_SUCCESS, payload: data });
+    //for updating the navbar with updated name
+    dispatch({ type: USER_LOGIN_SUCCESS, payload: data });
+    // set the user info in local storage
+    localStorage.setItem("userInfo", JSON.stringify(data));
   } catch (error) {
     dispatch({
       type: USER_UPDATE_PROFILE_FAIL,

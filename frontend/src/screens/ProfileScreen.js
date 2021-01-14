@@ -5,7 +5,7 @@ import Message from "../components/Message";
 import Loader from "../components/Loader";
 // register action
 import { getUserDetails, updateUserProfile } from "../actions/userActions";
-
+import { USER_UPDATE_PROFILE_RESET } from "../constants/userConstants";
 const ProfileScreen = ({ location, history }) => {
   const [nameFromState, setNameFromState] = useState("");
   const [emailFromState, setEmailFromState] = useState("");
@@ -29,7 +29,9 @@ const ProfileScreen = ({ location, history }) => {
       history.push("/login");
     } else {
       // check for user details user name
-      if (!user.name) {
+      if (!user || !user.name || success) {
+        // reset the update user profile state
+        dispatchHook({ type: USER_UPDATE_PROFILE_RESET });
         //getUserDetails action takes in an id but in this scenario we pass in the text profile so in the action the /api/users/profile route will be hit instead of /api/users/id
         dispatchHook(getUserDetails("profile"));
       } else {
@@ -38,7 +40,7 @@ const ProfileScreen = ({ location, history }) => {
       }
     }
     // to update the form values we need to add user as a dependency to useEffect so when the user field is updated the form is updated
-  }, [dispatchHook, history, userInfo, user]);
+  }, [dispatchHook, history, userInfo, user, success]);
   // submit handler
   const submitHandler = (e) => {
     e.preventDefault();
