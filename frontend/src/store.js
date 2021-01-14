@@ -4,7 +4,12 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import { productListReducer } from "./reducers/productReducers";
 import { productDetailsReducer } from "./reducers/productReducers";
 import { cartReducer } from "./reducers/cartReducers";
-import { userLoginReducer, userRegisterReducer } from "./reducers/userReducer";
+import {
+  userLoginReducer,
+  userRegisterReducer,
+  userDetailsReducer,
+  userUpdateProfileReducer,
+} from "./reducers/userReducer";
 // combine reducers
 const reducer = combineReducers({
   productList: productListReducer,
@@ -12,6 +17,8 @@ const reducer = combineReducers({
   cart: cartReducer,
   userLogin: userLoginReducer,
   userRegister: userRegisterReducer,
+  userDetails: userDetailsReducer,
+  userUpdateProfile: userUpdateProfileReducer,
 });
 //fetch cart data from local storage  if available else set to empty array
 const cartItemsFromStorage = localStorage.getItem("cartItems")
