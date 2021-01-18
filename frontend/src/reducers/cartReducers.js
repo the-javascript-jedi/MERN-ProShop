@@ -2,6 +2,7 @@ import {
   CART_ADD_ITEM,
   CART_REMOVE_ITEM,
   CART_SAVE_SHIPPING_ADDRESS,
+  CART_SAVE_PAYMENT_METHOD,
 } from "../constants/cartConstants";
 //cartItems is an intial state as an empty array
 //shippingAddress is an initial state with empty object
@@ -49,6 +50,12 @@ export const cartReducer = (
         ...state,
         // add the shipping address
         shippingAddress: action.payload,
+      };
+    case CART_SAVE_PAYMENT_METHOD:
+      return {
+        ...state,
+        // add the shipping address
+        paymentMethod: action.payload,
       };
     default:
       return state;

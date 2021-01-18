@@ -3,6 +3,7 @@ import {
   CART_ADD_ITEM,
   CART_REMOVE_ITEM,
   CART_SAVE_SHIPPING_ADDRESS,
+  CART_SAVE_PAYMENT_METHOD,
 } from "../constants/cartConstants";
 //dispatch is passed to the action
 // getState - is passed to get the entire state tree from the reducer
@@ -42,4 +43,14 @@ export const saveShippingAddress = (data) => (dispatch, getState) => {
   });
   // save to the local storage
   localStorage.setItem("shippingAddress", JSON.stringify(data));
+};
+// save the payment method
+//it takes in the submitted payment methoda
+export const savePaymentMethod = (data) => (dispatch, getState) => {
+  dispatch({
+    type: CART_SAVE_PAYMENT_METHOD,
+    payload: data,
+  });
+  // save to the local storage
+  localStorage.setItem("paymentMethod", JSON.stringify(data));
 };
