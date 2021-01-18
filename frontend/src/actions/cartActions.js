@@ -1,5 +1,9 @@
 import axios from "axios";
-import { CART_ADD_ITEM, CART_REMOVE_ITEM } from "../constants/cartConstants";
+import {
+  CART_ADD_ITEM,
+  CART_REMOVE_ITEM,
+  CART_SAVE_SHIPPING_ADDRESS,
+} from "../constants/cartConstants";
 //dispatch is passed to the action
 // getState - is passed to get the entire state tree from the reducer
 export const addToCart = (id, qty) => async (dispatch, getState) => {
@@ -28,4 +32,14 @@ export const removeFromCart = (id) => (dispatch, getState) => {
     payload: id,
   });
   localStorage.setItem("cartItems", JSON.stringify(getState().cart.cartItems));
+};
+// save the shipping address
+//it takes in the submitted form data
+export const saveShippingAddress = (data) => (dispatch, getState) => {
+  dispatch({
+    type: CART_SAVE_SHIPPING_ADDRESS,
+    payload: data,
+  });
+  // save to the local storage
+  localStorage.setItem("shippingAddress", JSON.stringify(data));
 };

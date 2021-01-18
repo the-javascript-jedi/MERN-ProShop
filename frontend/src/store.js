@@ -28,9 +28,15 @@ const cartItemsFromStorage = localStorage.getItem("cartItems")
 const userInfoFromStorage = localStorage.getItem("userInfo")
   ? JSON.parse(localStorage.getItem("userInfo"))
   : null;
+//fetch shipping address data from local storage if available else set to null
+const shippingAddressFromStorage = localStorage.getItem("shippingAddress")
+  ? JSON.parse(localStorage.getItem("shippingAddress"))
+  : {};
 const initialState = {
-  //if localStorage has any cart values set the state to localStorage cart data
-  cart: { cartItems: cartItemsFromStorage },
+  cart: {
+    cartItems: cartItemsFromStorage,
+    shippingAddress: shippingAddressFromStorage,
+  },
   //if localStorage has any user info values set the state to localStorage user info data
   userLogin: { userInfo: userInfoFromStorage },
 };

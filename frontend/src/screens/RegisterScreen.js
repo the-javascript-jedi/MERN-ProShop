@@ -4,10 +4,10 @@ import { Form, Button, Row, Col } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import Message from "../components/Message";
 import Loader from "../components/Loader";
-// register action
-import { register } from "../actions/userActions";
 // form container component
 import FormContainer from "../components/FormContainer";
+// register action
+import { register } from "../actions/userActions";
 const RegisterScreen = ({ location, history }) => {
   const [nameFromState, setNameFromState] = useState("");
   const [emailFromState, setEmailFromState] = useState("");

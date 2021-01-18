@@ -1,6 +1,14 @@
-import { CART_ADD_ITEM, CART_REMOVE_ITEM } from "../constants/cartConstants";
+import {
+  CART_ADD_ITEM,
+  CART_REMOVE_ITEM,
+  CART_SAVE_SHIPPING_ADDRESS,
+} from "../constants/cartConstants";
 //cartItems is an intial state as an empty array
-export const cartReducer = (state = { cartItems: [] }, action) => {
+//shippingAddress is an initial state with empty object
+export const cartReducer = (
+  state = { cartItems: [], shippingAddress: {} },
+  action
+) => {
   switch (action.type) {
     case CART_ADD_ITEM:
       const item = action.payload;
@@ -35,6 +43,12 @@ export const cartReducer = (state = { cartItems: [] }, action) => {
         //   return age != 3;
         // }
         // O/P-1,2,4,5
+      };
+    case CART_SAVE_SHIPPING_ADDRESS:
+      return {
+        ...state,
+        // add the shipping address
+        shippingAddress: action.payload,
       };
     default:
       return state;
