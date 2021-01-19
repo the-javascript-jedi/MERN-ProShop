@@ -6,6 +6,8 @@ import connectDB from "./config/db.js";
 import productRoutes from "./routes/productRoutes.js";
 //User Routes
 import userRoutes from "./routes/userRoutes.js";
+//Order Routes
+import orderRoutes from "./routes/orderRoutes.js";
 //Custom Error Middleware
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 
@@ -22,6 +24,8 @@ app.get("/", (req, res) => {
 app.use("/api/products", productRoutes);
 //mount the user routes
 app.use("/api/users", userRoutes);
+// mount the order route
+app.use("/api/orders", orderRoutes);
 // error message for anything that is not actually a route
 app.use(notFound);
 // wrong format of product id
