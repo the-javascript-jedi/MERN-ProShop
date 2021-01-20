@@ -23,10 +23,10 @@ const orderSchema = mongoose.Schema(
     ],
     // shippingAddress are embedded objects
     shippingAddress: {
-      address: { type: String, required: true },
-      city: { type: String, required: true },
-      postalCode: { type: String, required: true },
-      country: { type: String, required: true },
+      addressFromState: { type: String, required: true },
+      cityFromState: { type: String, required: true },
+      postalCodeFromState: { type: String, required: true },
+      countryCodeFromState: { type: String, required: true },
     },
     paymentMethod: {
       type: String,

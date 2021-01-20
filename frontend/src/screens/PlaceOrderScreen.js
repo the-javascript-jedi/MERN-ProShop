@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Row, Col, ListGroup, Image, Card } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 // import bread crumbs
@@ -6,8 +6,23 @@ import CheckOutSteps from "../components/CheckOutSteps";
 import Message from "../components/Message";
 import Loader from "../components/Loader";
 import { Link } from "react-router-dom";
-const PlaceOrderScreen = () => {
+// createOrder action
+import { createOrder } from "../actions/orderActions";
+const PlaceOrderScreen = ({ history }) => {
+  // select the necessary state using useDispatchHook from store
   const cart = useSelector((state) => state.cart);
+  const orderCreate = useSelector((state) => state.orderCreate);
+  const { order, success, error } = orderCreate;
+  useEffect(() => {
+    if (success) {
+      history.push(`/order/${order._id}`);
+    }
+    // we add the below line to hide the warning because order._id does not exist yet
+    // eslint-disable-next-line
+  }, [history, success]);
+
+  // dispatch an action using useDispatch hook
+  const dispatchHook = useDispatch();
   console.log("cart--PlaceOrderScreen.js", cart);
   // function to round decimal places to two numbers
   //.2=>.20, .25=>.25
@@ -18,13 +33,24 @@ const PlaceOrderScreen = () => {
   cart.itemsPrice = addDecimals(
     cart.cartItems.reduce((acc, item) => acc + item.price * item.qty, 0)
   );
-
   // calculate shipping
   cart.shippingPrice = addDecimals(cart.itemsPrice > 100 ? 0 : 100);
   // calculate taxprice
   cart.taxPrice = addDecimals(Number((0.15 * cart.itemsPrice).toFixed(2)));
+  // dispatch the action event
   const placeOrderHandler = () => {
-    console.log("order");
+    console.log("order--PlaceOrderScreen.js");
+    dispatchHook(
+      createOrder({
+        orderItems: cart.cartItems,
+        shippingAddress: cart.shippingAddress,
+        paymentMethod: cart.paymentMethod,
+        itemsPrice: cart.itemsPrice,
+        taxPrice: cart.taxPrice,
+        shippingPrice: cart.shippingPrice,
+        totalPrice: cart.totalPrice,
+      })
+    );
   };
   // total price
   cart.totalPrice =
@@ -121,6 +147,10 @@ const PlaceOrderScreen = () => {
                   <Col>Tax</Col>
                   <Col>${cart.totalPrice}</Col>
                 </Row>
+              </ListGroup.Item>
+              {/* error messsage if error is received */}
+              <ListGroup.Item>
+                {error && <Message variant="danger">{error}</Message>}
               </ListGroup.Item>
               <ListGroup.Item>
                 <button
