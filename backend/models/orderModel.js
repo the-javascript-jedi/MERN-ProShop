@@ -5,6 +5,7 @@ const orderSchema = mongoose.Schema(
     user: {
       type: String,
       required: true,
+      //reference the user model using ref keyword
       ref: "User",
     },
     // array of orderItems

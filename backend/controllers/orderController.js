@@ -37,4 +37,22 @@ const addOrderItems = asyncHandler(async (req, res) => {
     res.status(201).json(createdOrder);
   }
 });
-export { addOrderItems };
+
+//@desc  Get order by ID
+//@route POST /api/orders/:id
+//@access Private
+const getOrderbyId = asyncHandler(async (req, res) => {
+  // in addition to the user's order info we also need to get the user's name and email associated with this order
+  //first argument is user collection // second argument is a space separated field of fields we want eg(name email)
+  const order = await Order.findById(req.params.id).populate(
+    "user",
+    "name email isAdmin password rating"
+  );
+  if (order) {
+    res.json(order);
+  } else {
+    res.status(404);
+    throw new Error("Order not found");
+  }
+});
+export { addOrderItems, getOrderbyId };
