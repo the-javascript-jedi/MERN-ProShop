@@ -8,7 +8,9 @@ import {
   ORDER_PAY_FAIL,
   ORDER_PAY_SUCCESS,
   ORDER_PAY_REQUEST,
-  ORDER_PAY_RESET,
+  ORDER_LIST_MY_REQUEST,
+  ORDER_LIST_MY_SUCCESS,
+  ORDER_LIST_MY_FAIL,
 } from "../constants/orderConstants";
 import axios from "axios";
 // createOrder action
@@ -110,6 +112,42 @@ export const payOrder = (orderId, paymentResult) => async (
   } catch (error) {
     dispatch({
       type: ORDER_PAY_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+// listMyOrder action
+//we dont need to pass anything it knows us by our token
+//we need to send a token so we use getState - we can get userInfo from getState which has the token in it
+export const listMyOrders = (orderId, paymentResult) => async (
+  dispatch,
+  getState
+) => {
+  try {
+    // dispatch the ORDER_LIST_MY_REQUEST action
+    dispatch({ type: ORDER_LIST_MY_REQUEST });
+    // we want to destructure within 2 levels getState.userLogin.userInfo
+    const {
+      userLogin: { userInfo },
+    } = getState();
+    // we want to send a header with the content-type:application/json and token
+    const config = {
+      headers: {
+        //For GET request we don't need the content-type
+        //"Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+    // GET request
+    const { data } = await axios.get(`/api/orders/myorders`, config);
+    // after register dispatch the ORDER_LIST_MY_SUCCESS
+    dispatch({ type: ORDER_LIST_MY_SUCCESS, payload: data });
+  } catch (error) {
+    dispatch({
+      type: ORDER_LIST_MY_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message

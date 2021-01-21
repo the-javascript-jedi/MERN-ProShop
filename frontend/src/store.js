@@ -14,6 +14,7 @@ import {
   orderCreateReducer,
   orderDetailsReducer,
   orderPayReducer,
+  orderListMyReducer,
 } from "../src/reducers/orderReducers";
 // combine reducers
 const reducer = combineReducers({
@@ -27,6 +28,7 @@ const reducer = combineReducers({
   orderCreate: orderCreateReducer,
   orderDetails: orderDetailsReducer,
   orderPay: orderPayReducer,
+  orderListMy: orderListMyReducer,
 });
 //fetch cart data from local storage  if available else set to empty array
 const cartItemsFromStorage = localStorage.getItem("cartItems")
