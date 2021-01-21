@@ -26,6 +26,11 @@ app.use("/api/products", productRoutes);
 app.use("/api/users", userRoutes);
 // mount the order route
 app.use("/api/orders", orderRoutes);
+// paypal route
+// when we are ready to make the payment we will hit the below paypal route and get the client id
+app.get("/api/config/paypal", (req, res) =>
+  res.send(process.env.PAYPAL_CLIENT_ID)
+);
 // error message for anything that is not actually a route
 app.use(notFound);
 // wrong format of product id

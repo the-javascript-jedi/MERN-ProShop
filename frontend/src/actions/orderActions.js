@@ -5,6 +5,10 @@ import {
   ORDER_DETAILS_REQUEST,
   ORDER_DETAILS_SUCCESS,
   ORDER_DETAILS_FAIL,
+  ORDER_PAY_FAIL,
+  ORDER_PAY_SUCCESS,
+  ORDER_PAY_REQUEST,
+  ORDER_PAY_RESET,
 } from "../constants/orderConstants";
 import axios from "axios";
 // createOrder action
@@ -66,6 +70,46 @@ export const getOrderDetails = (id) => async (dispatch, getState) => {
   } catch (error) {
     dispatch({
       type: ORDER_DETAILS_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+// payOrder action
+//it accepts an order id and a paymentResult which comes from paypal
+//we need to send a token so we use getState - we can get userInfo from getState which has the token in it
+export const payOrder = (orderId, paymentResult) => async (
+  dispatch,
+  getState
+) => {
+  try {
+    // dispatch the ORDER_PAY_REQUEST action
+    dispatch({ type: ORDER_PAY_REQUEST });
+    // we want to destructure within 2 levels getState.userLogin.userInfo
+    const {
+      userLogin: { userInfo },
+    } = getState();
+    // we want to send a header with the content-type:application/json and token
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+    // PUT request
+    // pass in the paymentResult and headers config
+    const { data } = await axios.put(
+      `/api/orders/${orderId}/pay`,
+      paymentResult,
+      config
+    );
+    // after register dispatch the ORDER_PAY_SUCCESS
+    dispatch({ type: ORDER_PAY_SUCCESS, payload: data });
+  } catch (error) {
+    dispatch({
+      type: ORDER_PAY_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message
