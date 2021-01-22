@@ -17,6 +17,7 @@ import {
   USER_LIST_REQUEST,
   USER_LIST_SUCCESS,
   USER_LIST_FAIL,
+  USER_LIST_RESET,
 } from "../constants/userConstants";
 import { ORDER_LIST_MY_RESET } from "../constants/orderConstants";
 // login action requires and email and password
@@ -57,6 +58,8 @@ export const logout = (dispatch) => {
   // reset the order and user state
   dispatch({ type: USER_DETAILS_RESET });
   dispatch({ type: ORDER_LIST_MY_RESET });
+  //reset the state such that all the users fetched for get all users to display to the admin is reset
+  dispatch({ type: USER_LIST_RESET });
 };
 // register action
 // register action requires name, email and password
@@ -183,8 +186,6 @@ export const listUsers = (user) => async (dispatch, getState) => {
     const { data } = await axios.get(`/api/users`, config);
     // after register dispatch the USER_LIST_SUCCESS
     dispatch({ type: USER_LIST_SUCCESS, payload: data });
-    //for updating the navbar with updated name
-    dispatch({ type: USER_LOGIN_SUCCESS, payload: data });
     // set the user info in local storage
     localStorage.setItem("userInfo", JSON.stringify(data));
   } catch (error) {

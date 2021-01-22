@@ -6,12 +6,15 @@ import {
   registerUser,
   getUserProfile,
   updateUserProfile,
+  getUsers,
 } from "../controllers/userController.js";
 // import middleware
-import { protect } from "../middleware/authMiddleware.js";
+import { protect, admin } from "../middleware/authMiddleware.js";
 router.post("/login", authUser);
 // create user route
-router.route("/").post(registerUser);
+//for the same route ('/') we can chain a .get request
+//add the admin middleware as a second argument to the .get method
+router.route("/").post(registerUser).get(protect, admin, getUsers);
 // we need to protect the getUserProfile route,
 //to implement the protect middleware we need to pass it first
 // we chain the put method for updating the user profile

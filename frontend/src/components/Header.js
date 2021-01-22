@@ -4,7 +4,8 @@ import { Container, Navbar, Nav, NavDropdown } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 // import logout action
 import { logout } from "../actions/userActions";
-const Header = () => {
+import { withRouter } from "react-router";
+const Header = ({ history }) => {
   // useDispatch to fire dispatch actions
   const dispatchHook = useDispatch();
   // useSelector to access the state
@@ -14,6 +15,8 @@ const Header = () => {
     console.log("logout");
     // dispatch logout action
     dispatchHook(logout);
+    // navigate using the withRouter and getting history
+    history.push("/");
   };
   return (
     <header>
@@ -71,4 +74,4 @@ const Header = () => {
     </header>
   );
 };
-export default Header;
+export default withRouter(Header);

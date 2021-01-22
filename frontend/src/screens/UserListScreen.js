@@ -6,17 +6,25 @@ import Message from "../components/Message";
 import Loader from "../components/Loader";
 // import the actions
 import { listUsers } from "../actions/userActions";
-const UserListScreen = () => {
+const UserListScreen = ({ history }) => {
   // use dispatchHook to dispatch an action
   const dispatchHook = useDispatch();
   // use useSelector hook to get a specific state value
   const userList = useSelector((state) => state.userList);
   const { loading, error, users } = userList;
-  console.log("users", users);
+  // get the userLogin state so we can identify whether user is an admin user
+  const userLogin = useSelector((state) => state.userLogin);
+  const { userInfo } = userLogin;
+  console.log("userInfo", userInfo);
   useEffect(() => {
-    // dispatch the listUsers action
-    dispatchHook(listUsers());
-  }, [dispatchHook]);
+    // dispatch the listUsers action only if userInfo is present and user is an admin
+    if (userInfo && userInfo.isAdmin) {
+      dispatchHook(listUsers());
+    } else {
+      // if not an admin redirect to login page
+      // history.push("/login");
+    }
+  }, [dispatchHook, userInfo]);
   // delete handler
   const deleteHandler = (id) => {
     console.log("deleteHandler id", id);
