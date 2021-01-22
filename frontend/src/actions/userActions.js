@@ -14,6 +14,9 @@ import {
   USER_UPDATE_PROFILE_REQUEST,
   USER_UPDATE_PROFILE_SUCCESS,
   USER_DETAILS_RESET,
+  USER_LIST_REQUEST,
+  USER_LIST_SUCCESS,
+  USER_LIST_FAIL,
 } from "../constants/userConstants";
 import { ORDER_LIST_MY_RESET } from "../constants/orderConstants";
 // login action requires and email and password
@@ -150,6 +153,43 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
   } catch (error) {
     dispatch({
       type: USER_UPDATE_PROFILE_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+// list users action
+// listUsers action does not require any arguments
+//we need to send a token so we use getState - we can get userInfo from getState which has the token in it
+export const listUsers = (user) => async (dispatch, getState) => {
+  try {
+    // dispatch the USER_LIST_REQUEST action
+    dispatch({ type: USER_LIST_REQUEST });
+    // we want to destructure within 2 levels getState.userLogin.userInfo
+    const {
+      userLogin: { userInfo },
+    } = getState();
+    // we want to send a header with the content-type:application/json and token
+    const config = {
+      headers: {
+        // GET request does not require content-type
+        // "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+    // GET request,
+    const { data } = await axios.get(`/api/users`, config);
+    // after register dispatch the USER_LIST_SUCCESS
+    dispatch({ type: USER_LIST_SUCCESS, payload: data });
+    //for updating the navbar with updated name
+    dispatch({ type: USER_LOGIN_SUCCESS, payload: data });
+    // set the user info in local storage
+    localStorage.setItem("userInfo", JSON.stringify(data));
+  } catch (error) {
+    dispatch({
+      type: USER_LIST_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message
