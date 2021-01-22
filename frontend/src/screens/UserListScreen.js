@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Message from "../components/Message";
 import Loader from "../components/Loader";
 // import the actions
-import { listUsers } from "../actions/userActions";
+import { listUsers, deleteUser } from "../actions/userActions";
 const UserListScreen = ({ history }) => {
   // use dispatchHook to dispatch an action
   const dispatchHook = useDispatch();
@@ -15,7 +15,11 @@ const UserListScreen = ({ history }) => {
   // get the userLogin state so we can identify whether user is an admin user
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
-  console.log("userInfo", userInfo);
+  // get the success message from state when user has been deleted
+  const userDelete = useSelector((state) => state.userDelete);
+  // rename success to successDelete
+  const { success: successDelete } = userDelete;
+  console.log("userInfo--UserListScreen.js", userInfo);
   useEffect(() => {
     // dispatch the listUsers action only if userInfo is present and user is an admin
     if (userInfo && userInfo.isAdmin) {
@@ -24,10 +28,14 @@ const UserListScreen = ({ history }) => {
       // if not an admin redirect to login page
       // history.push("/login");
     }
-  }, [dispatchHook, userInfo]);
+  }, [dispatchHook, userInfo, successDelete]);
   // delete handler
   const deleteHandler = (id) => {
     console.log("deleteHandler id", id);
+    if (window.confirm("Are you sure?")) {
+      // dispatch the delete action with the id
+      dispatchHook(deleteUser(id));
+    }
   };
   return (
     <>

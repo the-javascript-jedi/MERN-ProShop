@@ -18,6 +18,9 @@ import {
   USER_LIST_SUCCESS,
   USER_LIST_FAIL,
   USER_LIST_RESET,
+  USER_DELETE_REQUEST,
+  USER_DELETE_SUCCESS,
+  USER_DELETE_FAIL,
 } from "../constants/userConstants";
 import { ORDER_LIST_MY_RESET } from "../constants/orderConstants";
 // login action requires and email and password
@@ -186,11 +189,44 @@ export const listUsers = (user) => async (dispatch, getState) => {
     const { data } = await axios.get(`/api/users`, config);
     // after register dispatch the USER_LIST_SUCCESS
     dispatch({ type: USER_LIST_SUCCESS, payload: data });
-    // set the user info in local storage
-    localStorage.setItem("userInfo", JSON.stringify(data));
   } catch (error) {
     dispatch({
       type: USER_LIST_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+// delete user action
+// deleteUser action does not require the id to be deleted
+//we need to send a token so we use getState - we can get userInfo from getState which has the token in it
+export const deleteUser = (id) => async (dispatch, getState) => {
+  try {
+    // dispatch the USER_DELETE_REQUEST action
+    dispatch({ type: USER_DELETE_REQUEST });
+    // we want to destructure within 2 levels getState.userLogin.userInfo
+    const {
+      userLogin: { userInfo },
+    } = getState();
+    // we want to send a header with the content-type:application/json and token
+    const config = {
+      headers: {
+        // GET request does not require content-type
+        // "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+    // DELETE request,
+    // const { data } = await axios.delete(`/api/users/${id}`, config);
+    await axios.delete(`/api/users/${id}`, config);
+    // after register dispatch the USER_DELETE_SUCCESS
+    // no need to send a payload
+    dispatch({ type: USER_DELETE_SUCCESS });
+  } catch (error) {
+    dispatch({
+      type: USER_DELETE_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message
