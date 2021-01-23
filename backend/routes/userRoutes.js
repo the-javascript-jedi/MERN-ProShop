@@ -8,6 +8,8 @@ import {
   updateUserProfile,
   getUsers,
   deleteUser,
+  getUserById,
+  updateUser,
 } from "../controllers/userController.js";
 // import middleware
 import { protect, admin } from "../middleware/authMiddleware.js";
@@ -24,7 +26,12 @@ router
   .get(protect, getUserProfile)
   .put(protect, updateUserProfile);
 // delete route
+//we chain the get and put request for getUserById,updateUser respectively
 //we add protect and admin access middleware
-router.route("/:id").delete(protect, admin, deleteUser);
+router
+  .route("/:id")
+  .delete(protect, admin, deleteUser)
+  .get(protect, admin, getUserById)
+  .put(protect, admin, updateUser);
 
 export default router;

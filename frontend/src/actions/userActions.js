@@ -218,8 +218,7 @@ export const deleteUser = (id) => async (dispatch, getState) => {
         Authorization: `Bearer ${userInfo.token}`,
       },
     };
-    // DELETE request,
-    // const { data } = await axios.delete(`/api/users/${id}`, config);
+    // DELETE request
     await axios.delete(`/api/users/${id}`, config);
     // after register dispatch the USER_DELETE_SUCCESS
     // no need to send a payload

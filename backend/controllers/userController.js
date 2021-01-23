@@ -34,6 +34,7 @@ const authUser = asyncHandler(async (req, res) => {
 //@access Private
 const getUserProfile = asyncHandler(async (req, res) => {
   //find the user by id
+  //(req.user._id)-logged in user
   const user = await User.findById(req.user._id);
   // res.send("Success");
   if (user) {
@@ -54,6 +55,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
 // this below route will require a token from the front end
 const updateUserProfile = asyncHandler(async (req, res) => {
   //find the user by id
+  //(req.user._id)-logged in user
   const user = await User.findById(req.user._id);
   // res.send("Success");
   if (user) {
@@ -136,6 +138,49 @@ const deleteUser = asyncHandler(async (req, res) => {
     throw new Error("User Not Found");
   }
 });
+// only admin can view all the user details
+//@desc get user by ID
+//@route GET /api/users/:id
+//@access Private/Admin
+const getUserById = asyncHandler(async (req, res) => {
+  // send the user back without the password
+  const user = await User.findById(req.params.id).select("-password");
+  if (user) {
+    res.json(user);
+  } else {
+    res.status(404);
+    throw new Error("User Not Found");
+  }
+});
+//@desc Update the user for edit user
+//@route PUT /api/users/:id
+//@access Private/Admin
+const updateUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (user) {
+    // if no data is present use the data in db
+    user.name = req.body.name || user;
+    user.body = req.body.email || user;
+    // check if admin value is passed in the request else save isAdmin as false by default
+    if (req.body.isAdmin) {
+      user.isAdmin = req.body.isAdmin;
+    } else {
+      user.isAdmin = false;
+    }
+    // save the updated user with the updated values
+    const updatedUser = await user.save();
+    // return the updated data
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      isAdmin: updatedUser.isAdmin,
+    });
+  } else {
+    res.status(404);
+    throw new Error("User Not Found");
+  }
+});
 export {
   authUser,
   getUserProfile,
@@ -143,4 +188,6 @@ export {
   updateUserProfile,
   getUsers,
   deleteUser,
+  getUserById,
+  updateUser,
 };

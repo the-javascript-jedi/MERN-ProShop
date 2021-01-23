@@ -75,7 +75,7 @@ const RegisterScreen = ({ location, history }) => {
             onChange={(e) => setPasswordFromState(e.target.value)}
           ></Form.Control>
         </Form.Group>
-        {/* Password */}
+        {/*Confirm Password */}
         <Form.Group controlId="password">
           <Form.Label>Confirm Password</Form.Label>
           <Form.Control
