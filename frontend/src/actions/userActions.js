@@ -21,6 +21,9 @@ import {
   USER_DELETE_REQUEST,
   USER_DELETE_SUCCESS,
   USER_DELETE_FAIL,
+  USER_UPDATE_REQUEST,
+  USER_UPDATE_SUCCESS,
+  USER_UPDATE_FAIL,
 } from "../constants/userConstants";
 import { ORDER_LIST_MY_RESET } from "../constants/orderConstants";
 // login action requires and email and password
@@ -226,6 +229,42 @@ export const deleteUser = (id) => async (dispatch, getState) => {
   } catch (error) {
     dispatch({
       type: USER_DELETE_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+// update user data action
+// updateuser action require the user object
+//we need to send a token so we use getState - we can get userInfo from getState which has the token in it
+export const updateUser = (user) => async (dispatch, getState) => {
+  try {
+    // dispatch the USER_UPDATE_REQUEST action
+    dispatch({ type: USER_UPDATE_REQUEST });
+    // we want to destructure within 2 levels getState.userLogin.userInfo
+    const {
+      userLogin: { userInfo },
+    } = getState();
+    // we want to send a header with the content-type:application/json and token
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+    // PUT request
+    // send the user data as a second argument
+    const { data } = await axios.put(`/api/users/${user._id}`, user, config);
+    // after register dispatch the USER_UPDATE_SUCCESS
+    // no need to send a payload
+    dispatch({ type: USER_UPDATE_SUCCESS });
+    // dispatch USER_DETAILS_SUCCESS so state.user will be updated with the updated data
+    dispatch({ type: USER_DETAILS_SUCCESS, payload: data });
+  } catch (error) {
+    dispatch({
+      type: USER_UPDATE_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message

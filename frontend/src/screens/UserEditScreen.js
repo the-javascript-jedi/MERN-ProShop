@@ -7,7 +7,9 @@ import Loader from "../components/Loader";
 // form container component
 import FormContainer from "../components/FormContainer";
 // mount actions
-import { getUserDetails } from "../actions/userActions";
+import { getUserDetails, updateUser } from "../actions/userActions";
+// constants
+import { USER_UPDATE_RESET } from "../constants/userConstants";
 const UserEditScreen = (props) => {
   const { match, history } = props;
   console.log("props", props);
@@ -22,22 +24,44 @@ const UserEditScreen = (props) => {
   // select the necessary state using useDispatchHook from store
   const userDetails = useSelector((state) => state.userDetails);
   const { loading, error, user } = userDetails;
-  // redirect if user is logged in
+  // we need to get the user update state so we can know if the update was successful or not
+  const userUpdate = useSelector((state) => state.userUpdate);
+  //rename fields respectively
+  const {
+    loading: loadingUpdate,
+    error: errorUpdate,
+    success: successUpdate,
+  } = userUpdate;
   useEffect(() => {
-    //   check if user is present
-    // also check if the user id from the url does not match the user id in db then fetch the user
-    if (!user.name || user._id !== userId) {
-      dispatchHook(getUserDetails(userId));
+    if (successUpdate) {
+      // redirect after update
+      dispatchHook({ type: USER_UPDATE_RESET });
+      history.push("/admin/userlist");
     } else {
-      // if user is already here then set the field values
-      setNameFromState(user.name);
-      setEmailFromState(user.email);
-      setIsAdminFromState(user.isAdmin);
+      //   check if user is present
+      // also check if the user id from the url does not match the user id in db then fetch the user
+      if (!user.name || user._id !== userId) {
+        dispatchHook(getUserDetails(userId));
+      } else {
+        // if user is already here then set the field values
+        setNameFromState(user.name);
+        setEmailFromState(user.email);
+        setIsAdminFromState(user.isAdmin);
+      }
     }
-  }, [dispatchHook, userId, user]);
+  }, [dispatchHook, history, userId, user, successUpdate]);
   // submit handler
   const submitHandler = (e) => {
     e.preventDefault();
+    // pass the updated user details as object to action
+    dispatchHook(
+      updateUser({
+        _id: userId,
+        name: nameFromState,
+        email: emailFromState,
+        isAdmin: isAdminFromState,
+      })
+    );
   };
   return (
     <>
@@ -47,6 +71,9 @@ const UserEditScreen = (props) => {
       </Link>
       <FormContainer>
         <h1>Edit User</h1>
+        {/* showLoading and error for update action*/}
+        {loadingUpdate && <Loader />}
+        {errorUpdate && <Message variant="danger">{errorUpdate}</Message>}
         {/* show a loading icon or error icon based on the flags from action state */}
         {loading ? (
           <Loader />

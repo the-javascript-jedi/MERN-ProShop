@@ -121,7 +121,7 @@ const registerUser = asyncHandler(async (req, res) => {
 const getUsers = asyncHandler(async (req, res) => {
   //find all users - we just pass an empty object to get all users
   const users = await User.find({});
-  console.log("users--getUsers--userController.js", users);
+  // console.log("users--getUsers--userController.js", users);
   res.json(users);
 });
 //@desc Delete user
@@ -156,6 +156,7 @@ const getUserById = asyncHandler(async (req, res) => {
 //@route PUT /api/users/:id
 //@access Private/Admin
 const updateUser = asyncHandler(async (req, res) => {
+  console.log("req-updateUser--userController.js", req);
   const user = await User.findById(req.params.id);
   if (user) {
     // if no data is present use the data in db
