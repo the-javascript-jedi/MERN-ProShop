@@ -9,6 +9,9 @@ import {
   PRODUCT_DELETE_REQUEST,
   PRODUCT_DELETE_SUCCESS,
   PRODUCT_DELETE_FAIL,
+  PRODUCT_CREATE_REQUEST,
+  PRODUCT_CREATE_SUCCESS,
+  PRODUCT_CREATE_FAIL,
 } from "../constants/productConstants";
 // to make an asynchronous request we use redux thunk-using thunk we can call a function within a function
 export const listProducts = () => async (dispatch) => {
@@ -77,6 +80,40 @@ export const deleteProduct = (id) => async (dispatch, getState) => {
   } catch (error) {
     dispatch({
       type: PRODUCT_DELETE_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+// createProduct action
+//create product creates a sample product with dummy data
+//we need to send a token so we use getState - we can get userInfo from getState which has the token in it
+export const createProduct = (id) => async (dispatch, getState) => {
+  try {
+    // dispatch the PRODUCT_CREATE_REQUEST action
+    dispatch({ type: PRODUCT_CREATE_REQUEST });
+    // we want to destructure within 2 levels getState.userLogin.userInfo
+    const {
+      userLogin: { userInfo },
+    } = getState();
+    // we want to send a header with the content-type:application/json and token
+    const config = {
+      headers: {
+        //For GET,DELETE request we don't need the content-type
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+    // POST request
+    // we send an empty object as the second argument because we are actually not sending any data
+    const { data } = await axios.post(`/api/products`, {}, config);
+    // after register dispatch the PRODUCT_CREATE_SUCCESS
+    dispatch({ type: PRODUCT_CREATE_SUCCESS, payload: data });
+  } catch (error) {
+    dispatch({
+      type: PRODUCT_CREATE_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message

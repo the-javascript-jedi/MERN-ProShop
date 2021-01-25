@@ -4,8 +4,14 @@ import { Table, Button, Row, Col } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import Message from "../components/Message";
 import Loader from "../components/Loader";
+// import reset constants
+import { PRODUCT_CREATE_RESET } from "../constants/productConstants";
 // import the actions
-import { listProducts, deleteProduct } from "../actions/productActions";
+import {
+  listProducts,
+  deleteProduct,
+  createProduct,
+} from "../actions/productActions";
 const ProductListScreen = ({ history, match }) => {
   // use dispatchHook to dispatch an action
   const dispatchHook = useDispatch();
@@ -19,20 +25,39 @@ const ProductListScreen = ({ history, match }) => {
     error: errorDelete,
     success: successDelete,
   } = productDelete;
+  // create product state
+  const productCreate = useSelector((state) => state.productCreate);
+  const {
+    loading: loadingCreate,
+    error: errorCreate,
+    success: successCreate,
+    product: createdProduct,
+  } = productCreate;
   // get the userLogin state so we can identify whether user is an admin user
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
   //console.log("userInfo--ProductListScreen.js", userInfo);
   useEffect(() => {
-    // if userInfo is present and user is an admin and dispatch the listProducts action
-    //successDelete is passed as a dependency to useEffect so that after successful delete the listProducts() action is dispatched again
-    if (userInfo && userInfo.isAdmin) {
-      dispatchHook(listProducts());
-    } else {
-      // if not an admin redirect to login page
+    // reset the state when useEffect is run
+    dispatchHook({ type: PRODUCT_CREATE_RESET });
+    // if user is not an admin we need to redirect
+    if (!userInfo.isAdmin) {
       history.push("/login");
     }
-  }, [dispatchHook, userInfo, history, successDelete]);
+    // if sample data is successfully created naviagate page to editProduct screen with the newly created product id as route params
+    if (successCreate) {
+      history.push(`/admin/product/${createdProduct._id}`);
+    } else {
+      dispatchHook(listProducts());
+    }
+  }, [
+    dispatchHook,
+    userInfo,
+    history,
+    successDelete,
+    successCreate,
+    createdProduct,
+  ]);
   // delete handler
   const deleteHandler = (id) => {
     console.log("deleteHandler id", id);
@@ -44,7 +69,8 @@ const ProductListScreen = ({ history, match }) => {
   };
   //   create handler
   const createProductHandler = (product) => {
-    //CREATE Product
+    //CREATE Product creates only sample data so no id is passed
+    dispatchHook(createProduct());
   };
   return (
     <>
@@ -62,6 +88,9 @@ const ProductListScreen = ({ history, match }) => {
       {/* show loading or error message when delete action is executed */}
       {loadingDelete && <Loader />}
       {errorDelete && <Message variant="danger">{errorDelete}</Message>}
+      {/* show loading or error message when create action is executed */}
+      {loadingCreate && <Loader />}
+      {errorCreate && <Message variant="danger">{errorCreate}</Message>}
       {/* show a loading or error message if it exists else display the html */}
       {loading ? (
         <Loader />

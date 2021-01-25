@@ -42,4 +42,63 @@ const deleteProduct = asyncHandler(async (req, res) => {
     throw new Error("Product Not Found");
   }
 });
-export { getProducts, getProductById, deleteProduct };
+//@desc  Create a Product
+//@route POST /api/products/
+//@access Private/Admin
+const createProduct = asyncHandler(async (req, res) => {
+  const product = new Product({
+    name: "Sample name",
+    price: 0,
+    user: req.user._id,
+    image: "/images/sample.jpg",
+    brand: "Sample Brand",
+    category: "Sample Category",
+    countinStock: 0,
+    numReviews: 0,
+    description: "Sample Description",
+  });
+  // create product with sample data
+  const createdProduct = await product.save();
+  // respond with the created product
+  res.status(201).json(createdProduct);
+});
+//@desc  Update a Product
+//@route PUT /api/products/:id
+//@access Private/Admin
+const updateProduct = asyncHandler(async (req, res) => {
+  const {
+    name,
+    price,
+    description,
+    image,
+    brand,
+    category,
+    countInStock,
+  } = req.body;
+  // search if product exists in db
+  const product = await Product.findById(req.params.id);
+  if (product) {
+    // set the db fields to the request body fields
+    product.name = name;
+    product.price = price;
+    product.description = description;
+    product.image = image;
+    product.brand = brand;
+    product.category = category;
+    product.countInStock = countInStock;
+    // update product with request body data
+    const updatedProduct = await product.save();
+    // respond with the updated data
+    res.status(201).json(updatedProduct);
+  } else {
+    res.status(404);
+    throw new Error("Product Not Found");
+  }
+});
+export {
+  getProducts,
+  getProductById,
+  deleteProduct,
+  createProduct,
+  updateProduct,
+};
