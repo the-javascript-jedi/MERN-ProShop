@@ -5,32 +5,41 @@ import { useDispatch, useSelector } from "react-redux";
 import Message from "../components/Message";
 import Loader from "../components/Loader";
 // import the actions
-import { listProducts } from "../actions/productActions";
+import { listProducts, deleteProduct } from "../actions/productActions";
 const ProductListScreen = ({ history, match }) => {
   // use dispatchHook to dispatch an action
   const dispatchHook = useDispatch();
   // use useSelector hook to get a specific state value
   const productList = useSelector((state) => state.productList);
   const { loading, error, products } = productList;
+  // get success value from productDelete state
+  const productDelete = useSelector((state) => state.productDelete);
+  const {
+    loading: loadingDelete,
+    error: errorDelete,
+    success: successDelete,
+  } = productDelete;
   // get the userLogin state so we can identify whether user is an admin user
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
   //console.log("userInfo--ProductListScreen.js", userInfo);
   useEffect(() => {
     // if userInfo is present and user is an admin and dispatch the listProducts action
+    //successDelete is passed as a dependency to useEffect so that after successful delete the listProducts() action is dispatched again
     if (userInfo && userInfo.isAdmin) {
       dispatchHook(listProducts());
     } else {
       // if not an admin redirect to login page
       history.push("/login");
     }
-  }, [dispatchHook, userInfo, history]);
+  }, [dispatchHook, userInfo, history, successDelete]);
   // delete handler
   const deleteHandler = (id) => {
     console.log("deleteHandler id", id);
+    // dispatch the delete action with the id
+    // DELETE Products
     if (window.confirm("Are you sure?")) {
-      // dispatch the delete action with the id
-      // DELETE Products
+      dispatchHook(deleteProduct(id));
     }
   };
   //   create handler
@@ -50,6 +59,9 @@ const ProductListScreen = ({ history, match }) => {
           </Button>
         </Col>
       </Row>
+      {/* show loading or error message when delete action is executed */}
+      {loadingDelete && <Loader />}
+      {errorDelete && <Message variant="danger">{errorDelete}</Message>}
       {/* show a loading or error message if it exists else display the html */}
       {loading ? (
         <Loader />

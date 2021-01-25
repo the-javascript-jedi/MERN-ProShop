@@ -6,6 +6,9 @@ import {
   PRODUCT_DETAILS_REQUEST,
   PRODUCT_DETAILS_SUCCESS,
   PRODUCT_DETAILS_FAIL,
+  PRODUCT_DELETE_REQUEST,
+  PRODUCT_DELETE_SUCCESS,
+  PRODUCT_DELETE_FAIL,
 } from "../constants/productConstants";
 // to make an asynchronous request we use redux thunk-using thunk we can call a function within a function
 export const listProducts = () => async (dispatch) => {
@@ -40,6 +43,40 @@ export const listProductDetails = (id) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: PRODUCT_DETAILS_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+// deleteProduct action
+//we need to pass the id of the product we need to delete
+//we need to send a token so we use getState - we can get userInfo from getState which has the token in it
+export const deleteProduct = (id) => async (dispatch, getState) => {
+  try {
+    // dispatch the PRODUCT_DELETE_REQUEST action
+    dispatch({ type: PRODUCT_DELETE_REQUEST });
+    // we want to destructure within 2 levels getState.userLogin.userInfo
+    const {
+      userLogin: { userInfo },
+    } = getState();
+    // we want to send a header with the content-type:application/json and token
+    const config = {
+      headers: {
+        //For GET,DELETE request we don't need the content-type
+        //"Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+    // DELETE request
+    await axios.delete(`/api/products/${id}`, config);
+    // after register dispatch the PRODUCT_DELETE_SUCCESS
+    // for delete request we don't need to pass any data to payload
+    dispatch({ type: PRODUCT_DELETE_SUCCESS });
+  } catch (error) {
+    dispatch({
+      type: PRODUCT_DELETE_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message
