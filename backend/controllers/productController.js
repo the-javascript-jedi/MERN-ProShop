@@ -48,12 +48,12 @@ const deleteProduct = asyncHandler(async (req, res) => {
 const createProduct = asyncHandler(async (req, res) => {
   const product = new Product({
     name: "Sample name",
-    price: 0,
+    price: 1,
     user: req.user._id,
     image: "/images/sample.jpg",
     brand: "Sample Brand",
     category: "Sample Category",
-    countinStock: 0,
+    countInStock: 1,
     numReviews: 0,
     description: "Sample Description",
   });

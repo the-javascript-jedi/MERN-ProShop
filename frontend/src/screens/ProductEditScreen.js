@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Form, Button } from "react-bootstrap";
@@ -22,12 +23,14 @@ const ProductEditScreen = (props) => {
   const [categoryFromState, setCategoryFromState] = useState("");
   const [countInStockFromState, setCountInStockFromState] = useState(0);
   const [descriptionFromState, setDescriptionFromState] = useState("");
+  const [uploadingFromState, setUploadingFromState] = useState(false);
 
   const dispatchHook = useDispatch();
   // select the necessary state using useDispatchHook from store
   // we select product from productDetails state
   const productDetails = useSelector((state) => state.productDetails);
   const { loading, error, product } = productDetails;
+  // console.log("product--productDetails", product);
   // we select updated product from productUpdate state
   const productUpdate = useSelector((state) => state.productUpdate);
   const {
@@ -51,11 +54,11 @@ const ProductEditScreen = (props) => {
         // if product is already here then set the field values
         //(i.e if product in the url is matching with the db)
         setNameFromState(product.name);
-        setPriceFromState(product.email);
+        setPriceFromState(product.price);
         setImageFromState(product.image);
         setBrandFromState(product.brand);
-        setCategoryFromState(product.state);
-        setCountInStockFromState(product.countinStock);
+        setCategoryFromState(product.category);
+        setCountInStockFromState(product.countInStock);
         setDescriptionFromState(product.description);
       }
     }
@@ -77,6 +80,32 @@ const ProductEditScreen = (props) => {
         countInStock: countInStockFromState,
       })
     );
+  };
+  // uploadFileHandler event
+  const uploadFileHandler = async (e) => {
+    // we are passing only a single file
+    const file = e.target.files[0];
+    // initialize a form data object
+    const formData = new FormData();
+    // append image to formdata
+    formData.append("image", file);
+    // show loader
+    setUploadingFromState(true);
+    try {
+      // set config file for uploading image
+      const config = {
+        "Content-Type": "multipart/form-data",
+      };
+      const { data } = await axios.post("/api/upload", formData, config);
+      console.log("data--axios.post(/api/upload)-->", data);
+      setImageFromState(data);
+      // stop loader
+      setUploadingFromState(false);
+    } catch (error) {
+      console.error(error);
+      // stop loader
+      setUploadingFromState(false);
+    }
   };
   return (
     <>
@@ -112,7 +141,7 @@ const ProductEditScreen = (props) => {
               <Form.Control
                 type="number"
                 placeholder="Enter Price"
-                value={priceFromState}
+                value={priceFromState || ""}
                 onChange={(e) => setPriceFromState(e.target.value)}
               ></Form.Control>
             </Form.Group>
@@ -125,6 +154,15 @@ const ProductEditScreen = (props) => {
                 value={imageFromState}
                 onChange={(e) => setImageFromState(e.target.value)}
               ></Form.Control>
+              {/* Upload file */}
+              <Form.File
+                id="image-file"
+                label="Choose File"
+                custom
+                onChange={uploadFileHandler}
+              ></Form.File>
+              {/* show loader when file is loading */}
+              {uploadingFromState && <Loader />}
             </Form.Group>
             {/* Brand */}
             <Form.Group controlId="Brand">

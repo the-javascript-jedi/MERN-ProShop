@@ -38,11 +38,12 @@ app.get("/api/config/paypal", (req, res) =>
   res.send(process.env.PAYPAL_CLIENT_ID)
 );
 // make uploads folder static so that it can get loaded in the browser
-// __dirname - points to current module -- only available if we use require syntax
+// __dirname - points to current directory -- only available if we use require syntax
 //workaround to make __dirname point to current path in ES6 module syntax
 const __dirname = path.resolve();
-// express.static(path.join(__dirname)) - takes to uploads folder and makes it static
-app.use("/uploads", express.static(path.join(__dirname)));
+//  express.static(path.join(__dirname, "/uploads")) - takes to uploads folder and makes it static
+//from there we goto /uploads
+app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 // error message for anything that is not actually a route
 app.use(notFound);
 // wrong format of product id
