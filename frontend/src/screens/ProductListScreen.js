@@ -46,7 +46,7 @@ const ProductListScreen = ({ history, match }) => {
     }
     // if sample data is successfully created naviagate page to editProduct screen with the newly created product id as route params
     if (successCreate) {
-      history.push(`/admin/product/${createdProduct._id}`);
+      history.push(`/admin/product/${createdProduct._id}/edit`);
     } else {
       dispatchHook(listProducts());
     }
