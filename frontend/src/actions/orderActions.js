@@ -14,6 +14,9 @@ import {
   ORDER_LIST_REQUEST,
   ORDER_LIST_SUCCESS,
   ORDER_LIST_FAIL,
+  ORDER_DELIVER_REQUEST,
+  ORDER_DELIVER_SUCCESS,
+  ORDER_DELIVER_FAIL,
 } from "../constants/orderConstants";
 import axios from "axios";
 // createOrder action
@@ -115,6 +118,44 @@ export const payOrder = (orderId, paymentResult) => async (
   } catch (error) {
     dispatch({
       type: ORDER_PAY_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+// deliverOrder action
+//it accepts the entire order
+//we need to send a token so we use getState - we can get userInfo from getState which has the token in it
+export const deliverOrder = (order) => async (dispatch, getState) => {
+  try {
+    // dispatch the ORDER_DELIVER_REQUEST action
+    dispatch({ type: ORDER_DELIVER_REQUEST });
+    // we want to destructure within 2 levels getState.userLogin.userInfo
+    const {
+      userLogin: { userInfo },
+    } = getState();
+    // we want to send a header with the content-type:application/json and token
+    const config = {
+      headers: {
+        //  we are not sending data so we don't need the Content-Type
+        // "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+    // PUT request
+    // we are not sending any data so pass an empty object to PUT request
+    const { data } = await axios.put(
+      `/api/orders/${order._id}/deliver`,
+      {},
+      config
+    );
+    // after register dispatch the ORDER_DELIVER_SUCCESS
+    dispatch({ type: ORDER_DELIVER_SUCCESS, payload: data });
+  } catch (error) {
+    dispatch({
+      type: ORDER_DELIVER_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message

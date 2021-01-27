@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, ListGroup, Image, Card } from "react-bootstrap";
+import { Row, Col, ListGroup, Image, Card, Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import Message from "../components/Message";
 import Loader from "../components/Loader";
@@ -8,10 +8,18 @@ import axios from "axios";
 // import paypal button
 import { PayPalButton } from "react-paypal-button-v2";
 // createOrder action
-import { getOrderDetails, payOrder } from "../actions/orderActions";
+import {
+  getOrderDetails,
+  payOrder,
+  deliverOrder,
+} from "../actions/orderActions";
 // import constants
-import { ORDER_PAY_RESET } from "../constants/orderConstants";
-const OrderScreen = ({ match }) => {
+import {
+  ORDER_PAY_RESET,
+  ORDER_DELIVER_RESET,
+} from "../constants/orderConstants";
+const OrderScreen = (props) => {
+  const { match, history } = props;
   // get order id from url
   const orderId = match.params.id;
   // state values
@@ -19,15 +27,30 @@ const OrderScreen = ({ match }) => {
   const [sdkReady, setSdkReady] = useState(false);
   // dispatch an action using useDispatch hook
   const dispatchHook = useDispatch();
+
   // select the necessary state using useSelector from store
   const orderDetails = useSelector((state) => state.orderDetails);
   const { order, loading, error } = orderDetails;
+
   //select orderPay
   const orderPay = useSelector((state) => state.orderPay);
   // rename loading to loadingPay and success to successPay destructured from orderPay respectively
   const { loading: loadingPay, success: successPay } = orderPay;
-  console.log("order--OrderScreen.js", order);
+
+  //select orderDeliver state
+  const orderDeliver = useSelector((state) => state.orderDeliver);
+  // rename loading to loadingDeliver and success to successDeliver destructured from orderDeliver respectively
+  // add successDeliver as a dependency to fire the useEffect hook
+  const { loading: loadingDeliver, success: successDeliver } = orderDeliver;
+
+  // get the userLogin state so we can identify whether user is an admin user
+  const userLogin = useSelector((state) => state.userLogin);
+  const { userInfo } = userLogin;
   useEffect(() => {
+    // make sure we are logged in
+    if (!userInfo) {
+      history.push("/login");
+    }
     const addPayPalScript = async () => {
       // fetch the clientId from backend
       const { data: clientId } = await axios.get("/api/config/paypal");
@@ -46,10 +69,12 @@ const OrderScreen = ({ match }) => {
     //addPayPalScript();
     //   check for the order id and aso if the order id matches the id in the url
     // successPay - dispatch request if the order has successfully been paid
-    if (!order || order._id !== orderId || successPay) {
-      // dispatch ORDER_PAY_RESET to reset the state else we will get a never ending loop from
+    // successDeliver - dispatch request if the order has been delivered
+    if (!order || order._id !== orderId || successPay || successDeliver) {
+      // dispatch ORDER_PAY_RESET,ORDER_DELIVER_RESET to reset the state else we will get a never ending loop from
       // if we do not reset once we pay page will keep refreshing
       dispatchHook({ type: ORDER_PAY_RESET });
+      dispatchHook({ type: ORDER_DELIVER_RESET });
       // dispatch getOrderDetails
       dispatchHook(getOrderDetails(orderId));
     }
@@ -64,7 +89,7 @@ const OrderScreen = ({ match }) => {
     }
     // we add the below line to hide the warning because order._id does not exist yet
     // eslint-disable-next-line
-  }, [dispatchHook, order, orderId, successPay]);
+  }, [dispatchHook, order, orderId, successPay, successDeliver]);
   // function to round decimal places to two numbers
   //.2=>.20, .25=>.25
   const addDecimals = (num) => {
@@ -86,6 +111,11 @@ const OrderScreen = ({ match }) => {
     console.log("paymentResult", paymentResult);
     // dispatch the payOrder action here
     dispatchHook(payOrder(orderId, paymentResult));
+  };
+  // deliver handler
+  const deliverHandler = () => {
+    // dispatch the deliverOrder action here and pass in the order
+    dispatchHook(deliverOrder(order));
   };
   // html content to be displayed if no error and loading is false
   return loading ? (
@@ -117,7 +147,7 @@ const OrderScreen = ({ match }) => {
               </p>
               {order.isDelivered ? (
                 <Message variant="success">
-                  Delivered on {order.DeliveredAt}
+                  Delivered on {order.deliveredAt}
                 </Message>
               ) : (
                 <Message variant="danger">Not Delivered</Message>
@@ -219,6 +249,24 @@ const OrderScreen = ({ match }) => {
                   )}
                 </ListGroup.Item>
               )}
+              {/* show loader if loadingDeliver is true */}
+              {loadingDeliver && <Loader />}
+              {/* show the set deliver button if the order i paid and has not been delivered*/}
+              {/* we need to check the userInfo first before checking userInfo.isAdmin or else we might get an error */}
+              {userInfo &&
+                userInfo.isAdmin &&
+                order.isPaid &&
+                !order.isDelivered && (
+                  <ListGroup.Item>
+                    <Button
+                      type="button"
+                      className="btn btn-block"
+                      onClick={deliverHandler}
+                    >
+                      Mark as Delivered
+                    </Button>
+                  </ListGroup.Item>
+                )}
             </ListGroup>
           </Card>
         </Col>

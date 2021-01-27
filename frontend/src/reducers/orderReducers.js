@@ -16,6 +16,10 @@ import {
   ORDER_LIST_REQUEST,
   ORDER_LIST_SUCCESS,
   ORDER_LIST_FAIL,
+  ORDER_DELIVER_REQUEST,
+  ORDER_DELIVER_SUCCESS,
+  ORDER_DELIVER_FAIL,
+  ORDER_DELIVER_RESET,
 } from "../constants/orderConstants";
 // order creating reducer
 export const orderCreateReducer = (state = {}, action) => {
@@ -92,7 +96,31 @@ export const orderPayReducer = (state = {}, action) => {
       return state;
   }
 };
-
+// order deliver reducer
+// state will be empty object
+export const orderDeliverReducer = (state = {}, action) => {
+  switch (action.type) {
+    case ORDER_DELIVER_REQUEST:
+      // spread whatever is in the state, this will keep us from getting errors when it loads
+      return {
+        loading: true,
+      };
+    case ORDER_DELIVER_SUCCESS:
+      return {
+        loading: false,
+        success: true,
+      };
+    case ORDER_DELIVER_FAIL:
+      return {
+        loading: false,
+        error: action.payload,
+      };
+    case ORDER_DELIVER_RESET:
+      return {};
+    default:
+      return state;
+  }
+};
 // order my list reducer
 // state will be have empty orders array to begin with
 export const orderListMyReducer = (state = { orders: [] }, action) => {
