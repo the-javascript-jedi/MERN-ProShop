@@ -93,4 +93,22 @@ const getMyOrders = asyncHandler(async (req, res) => {
   console.log("order--orderController.js", orders);
   res.json(orders);
 });
-export { addOrderItems, getOrderbyId, updateOrderToPaid, getMyOrders };
+
+// get all orders -- display to the admin
+//@desc  get all orders
+//@route GET /api/orders/myorders
+//@access Private/admin
+const getOrders = asyncHandler(async (req, res) => {
+  // console.log("req.user_id", req.user._id);
+  // console.log("user", user);
+  // from the user schema(1st argument) get the id and name that is assocoiated with that order(id and name are passed as second arguument)
+  const orders = await Order.find({}).populate("user", "id name");
+  res.json(orders);
+});
+export {
+  addOrderItems,
+  getOrderbyId,
+  updateOrderToPaid,
+  getMyOrders,
+  getOrders,
+};

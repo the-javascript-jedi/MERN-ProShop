@@ -11,6 +11,9 @@ import {
   ORDER_LIST_MY_REQUEST,
   ORDER_LIST_MY_SUCCESS,
   ORDER_LIST_MY_FAIL,
+  ORDER_LIST_REQUEST,
+  ORDER_LIST_SUCCESS,
+  ORDER_LIST_FAIL,
 } from "../constants/orderConstants";
 import axios from "axios";
 // createOrder action
@@ -122,10 +125,7 @@ export const payOrder = (orderId, paymentResult) => async (
 // listMyOrder action
 //we dont need to pass anything it knows us by our token
 //we need to send a token so we use getState - we can get userInfo from getState which has the token in it
-export const listMyOrders = (orderId, paymentResult) => async (
-  dispatch,
-  getState
-) => {
+export const listMyOrders = () => async (dispatch, getState) => {
   try {
     // dispatch the ORDER_LIST_MY_REQUEST action
     dispatch({ type: ORDER_LIST_MY_REQUEST });
@@ -148,6 +148,39 @@ export const listMyOrders = (orderId, paymentResult) => async (
   } catch (error) {
     dispatch({
       type: ORDER_LIST_MY_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+// listOrders action
+//we dont need to pass anything it knows us by our token
+//we need to send a token so we use getState - we can get userInfo from getState which has the token in it
+export const listOrders = () => async (dispatch, getState) => {
+  try {
+    // dispatch the ORDER_LIST_REQUEST action
+    dispatch({ type: ORDER_LIST_REQUEST });
+    // we want to destructure within 2 levels getState.userLogin.userInfo
+    const {
+      userLogin: { userInfo },
+    } = getState();
+    // we want to send a header with the content-type:application/json and token
+    const config = {
+      headers: {
+        //For GET request we don't need the content-type
+        //"Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+    // GET request
+    const { data } = await axios.get(`/api/orders`, config);
+    // after register dispatch the ORDER_LIST_SUCCESS
+    dispatch({ type: ORDER_LIST_SUCCESS, payload: data });
+  } catch (error) {
+    dispatch({
+      type: ORDER_LIST_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message

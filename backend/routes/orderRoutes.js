@@ -6,13 +6,15 @@ import {
   getOrderbyId,
   updateOrderToPaid,
   getMyOrders,
+  getOrders,
 } from "../controllers/orderController.js";
 // import middleware
-import { protect } from "../middleware/authMiddleware.js";
+import { protect, admin } from "../middleware/authMiddleware.js";
 // create new order route
 // we need to protect the addOrderItems route,
 //to implement the protect middleware we need to pass it first
-router.route("/").post(protect, addOrderItems);
+// we chanin the get request and pass in the protect and admin routes respectively
+router.route("/").post(protect, addOrderItems).get(protect, admin, getOrders);
 //route to calculate user orders
 router.route("/myorders").get(protect, getMyOrders);
 // make sure when we pass this id as param we need to keep it in the bottom else if we pass /somethingelse it will take the something else value as an id
