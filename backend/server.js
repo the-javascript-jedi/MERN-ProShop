@@ -3,6 +3,8 @@ import path from "path";
 import express from "express";
 import dotenv from "dotenv";
 import colors from "colors";
+import morgan from "morgan";
+
 import connectDB from "./config/db.js";
 //Product routes
 import productRoutes from "./routes/productRoutes.js";
@@ -19,6 +21,11 @@ dotenv.config();
 // connect to db
 connectDB();
 const app = express();
+// use mogan middleware in development for logging purpose
+if (process.env.NODE_ENV === "development") {
+  // we can pass in different arguments
+  app.use(morgan("dev"));
+}
 // this is used for reading the json data from body
 app.use(express.json());
 app.get("/", (req, res) => {
