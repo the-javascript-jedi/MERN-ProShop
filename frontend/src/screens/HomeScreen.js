@@ -5,7 +5,9 @@ import Product from "../components/Product";
 import { listProducts } from "../actions/productActions";
 import Message from "../components/Message";
 import Loader from "../components/Loader";
-const HomeScreen = () => {
+const HomeScreen = (props) => {
+  const { match } = props;
+  const keyword = match.params.keyword;
   //useDispatch() is a react hook used instead of higher order method like connect, mapStateToProps
   const dispatchHook = useDispatch();
   //useSelector hook is used for selecting the necessary state
@@ -15,8 +17,9 @@ const HomeScreen = () => {
   const { loading, error, products } = productList;
   useEffect(() => {
     //1-we fire a dispatch to listProducts() Action
-    dispatchHook(listProducts());
-  }, [dispatchHook]);
+    // pass keyord for search functionality
+    dispatchHook(listProducts(keyword));
+  }, [dispatchHook, keyword]);
 
   return (
     <>

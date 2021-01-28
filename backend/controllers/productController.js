@@ -5,7 +5,23 @@ import Product from "../models/productModel.js";
 //@route GET /api/products
 //@access Public
 const getProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find({});
+  // search if any keyword is passed in through body for search function
+  //req.query is used to get data from the querystring values => products?keyword=
+  // if keyword exists
+  const keyword = req.query.keyword
+    ? {
+        name: {
+          // search with regex to match keyword with name of the product
+          //since we use regex if we search with iph -> iphone is displayed
+          $regex: req.query.keyword,
+          // case insensitive
+          $options: "i",
+        },
+      }
+    : {};
+  // if empty object is passed a search displays all products, but if specific keyword is passed it returns particular product
+  //spread the keyword - either have name or empty object
+  const products = await Product.find({ ...keyword });
   // //simulate error
   // throw new Error("simulated error!!!");
   res.json(products);

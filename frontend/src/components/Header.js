@@ -1,10 +1,14 @@
 import React from "react";
+// Route for rendering the route
+import { Route } from "react-router-dom";
 import { LinkContainer } from "react-router-bootstrap";
 import { Container, Navbar, Nav, NavDropdown } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 // import logout action
 import { logout } from "../actions/userActions";
 import { withRouter } from "react-router";
+// import the searchbox component
+import SearchBox from "../components/SearchBox";
 const Header = ({ history }) => {
   // useDispatch to fire dispatch actions
   const dispatchHook = useDispatch();
@@ -27,6 +31,10 @@ const Header = ({ history }) => {
           </LinkContainer>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
+            {/* embed the searchbar using route */}
+            {/* since the header does not receive the router props we need to embed the route using render props */}
+            {/* using Route render we have access to history props we pass in the history props to SearchBox*/}
+            <Route render={({ history }) => <SearchBox history={history} />} />
             <Nav className="ml-auto">
               <LinkContainer to="/cart">
                 <Nav.Link>

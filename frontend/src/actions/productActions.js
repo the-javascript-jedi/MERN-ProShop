@@ -20,13 +20,14 @@ import {
   PRODUCT_CREATE_REVIEW_FAIL,
 } from "../constants/productConstants";
 // to make an asynchronous request we use redux thunk-using thunk we can call a function within a function
-export const listProducts = () => async (dispatch) => {
+// pass in keyword with default value set as empty string
+export const listProducts = (keyword = "") => async (dispatch) => {
   try {
     //2- listProducts() is dispatched from the HomeScreen.js
     //   dispatch the request
     dispatch({ type: PRODUCT_LIST_REQUEST });
     // data from axios request
-    const { data } = await axios.get("/api/products");
+    const { data } = await axios.get(`/api/products?keyword=${keyword}`);
     // request success
     //3-since data received is successful so it passes the data to the payload and calls the reducer
     dispatch({ type: PRODUCT_LIST_SUCCESS, payload: data });
