@@ -15,6 +15,9 @@ import {
   PRODUCT_UPDATE_REQUEST,
   PRODUCT_UPDATE_SUCCESS,
   PRODUCT_UPDATE_FAIL,
+  PRODUCT_CREATE_REVIEW_REQUEST,
+  PRODUCT_CREATE_REVIEW_SUCCESS,
+  PRODUCT_CREATE_REVIEW_FAIL,
 } from "../constants/productConstants";
 // to make an asynchronous request we use redux thunk-using thunk we can call a function within a function
 export const listProducts = () => async (dispatch) => {
@@ -155,6 +158,46 @@ export const updateProduct = (product) => async (dispatch, getState) => {
   } catch (error) {
     dispatch({
       type: PRODUCT_UPDATE_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+// createProductReview action
+//createProductReview takes the product id and a review object which has a rating and a comment
+//we need to send a token so we use getState - we can get userInfo from getState which has the token in it
+export const createProductReview = (productId, review) => async (
+  dispatch,
+  getState
+) => {
+  try {
+    // dispatch the PRODUCT_CREATE_REVIEW_REQUEST action
+    dispatch({ type: PRODUCT_CREATE_REVIEW_REQUEST });
+    // we want to destructure within 2 levels getState.userLogin.userInfo
+    const {
+      userLogin: { userInfo },
+    } = getState();
+    // we want to send a header with the content-type:application/json and token
+    const config = {
+      headers: {
+        //For GET,DELETE request we don't need the content-type
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+    // POST request
+    // we send the product id in the request as params
+    //we are not returning anything from the request except a message so we can simply call the route and ignore displaying the response message
+    //we pass in the review object as a second argument this will contain the rating and comments as data
+    await axios.post(`/api/products/${productId}/reviews`, review, config);
+    // after register dispatch the PRODUCT_CREATE_REVIEW_SUCCESS
+    //we doont need to send any payload:data to the request, so we simply dispatch the action type
+    dispatch({ type: PRODUCT_CREATE_REVIEW_SUCCESS });
+  } catch (error) {
+    dispatch({
+      type: PRODUCT_CREATE_REVIEW_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message

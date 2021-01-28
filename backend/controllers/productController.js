@@ -95,10 +95,57 @@ const updateProduct = asyncHandler(async (req, res) => {
     throw new Error("Product Not Found");
   }
 });
+//@desc  Create new review
+//@route POST /api/products/:id/reviews
+//@access Private
+const createProductReview = asyncHandler(async (req, res) => {
+  // get the rating and comment from request.body
+  const { rating, comment } = req.body;
+  // search if product exists in db
+  //use the params passed in the url
+  const product = await Product.findById(req.params.id);
+  if (product) {
+    //  check to see if user has already submitted a review
+    //will return true if the user has already provided a review
+    const alreadyReviewed = product.reviews.find(
+      // for each review check what we added in the product model for review schema and check if that user id is equal to the user id passed in the request
+      (r) => r.user.toString() === req.user._id.toString()
+    );
+    if (alreadyReviewed) {
+      res.status(400);
+      throw new Error("Product already Reviewed");
+    }
+    // if review not already added for same product construct a review object
+    const review = {
+      name: req.user.name,
+      rating: Number(rating),
+      comment,
+      user: req.user._id,
+      createdAt: Date.now(),
+    };
+    // push the review to the products.reviews array
+    product.reviews.push(review);
+    // calculate the length of the reviews
+    product.numReviews = product.reviews.length;
+    // calculate overall rating of the product-avg rating take all the ratings of the product and divide by number of reviews
+    product.rating =
+      product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+      product.reviews.length;
+    // save the product to db
+    await product.save();
+    res.status(201).json({
+      message: "Review added",
+    });
+  } else {
+    res.status(404);
+    throw new Error("Product Not Found");
+  }
+});
 export {
   getProducts,
   getProductById,
   deleteProduct,
   createProduct,
   updateProduct,
+  createProductReview,
 };

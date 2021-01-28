@@ -1,10 +1,24 @@
 import mongoose from "mongoose";
 //review schema
-const reviewSchema = mongoose.Schema({
-  name: { type: String, required: true },
-  rating: { type: Number, required: true },
-  name: { type: String, required: true },
-});
+const reviewSchema = mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    rating: { type: Number, required: true },
+    comment: { type: String, required: true },
+    // user is assosiated with the review
+    //this check is done to make sure user didn't already add a review
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      //reference the user model using ref keyword
+      ref: "User",
+    },
+    createdAt: { type: Date, default: Date.now },
+  },
+  {
+    timestamps: true,
+  }
+);
 // product schema
 const productSchema = mongoose.Schema(
   {
