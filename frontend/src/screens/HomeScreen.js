@@ -6,6 +6,7 @@ import { listProducts } from "../actions/productActions";
 import Message from "../components/Message";
 import Loader from "../components/Loader";
 import Paginate from "../components/Paginate";
+import ProductCarousel from "../components/ProductCarousel";
 const HomeScreen = (props) => {
   const { match } = props;
   const keyword = match.params.keyword;
@@ -25,6 +26,8 @@ const HomeScreen = (props) => {
 
   return (
     <>
+      {/* show carousel only if no search term is present */}
+      {!keyword && <ProductCarousel />}
       <h1>Latest Products</h1>
       {/* loading spinner */}
       {loading ? (
