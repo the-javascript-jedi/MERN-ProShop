@@ -21,13 +21,17 @@ import {
 } from "../constants/productConstants";
 // to make an asynchronous request we use redux thunk-using thunk we can call a function within a function
 // pass in keyword with default value set as empty string
-export const listProducts = (keyword = "") => async (dispatch) => {
+export const listProducts = (keyword = "", pageNumber = "") => async (
+  dispatch
+) => {
   try {
     //2- listProducts() is dispatched from the HomeScreen.js
     //   dispatch the request
     dispatch({ type: PRODUCT_LIST_REQUEST });
-    // data from axios request
-    const { data } = await axios.get(`/api/products?keyword=${keyword}`);
+    // data from axios request - pass in keyword(?) and pageNumber(&) as querystrings
+    const { data } = await axios.get(
+      `/api/products?keyword=${keyword}&pageNumber=${pageNumber}`
+    );
     // request success
     //3-since data received is successful so it passes the data to the payload and calls the reducer
     dispatch({ type: PRODUCT_LIST_SUCCESS, payload: data });

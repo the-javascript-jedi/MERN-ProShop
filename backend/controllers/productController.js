@@ -5,6 +5,12 @@ import Product from "../models/productModel.js";
 //@route GET /api/products
 //@access Public
 const getProducts = asyncHandler(async (req, res) => {
+  // set a static page size
+  const pageSize = 5;
+  //find whatever page is in the query
+  //if no page is included we are in page 1
+  const page = Number(req.query.pageNumber) || 1;
+
   // search if any keyword is passed in through body for search function
   //req.query is used to get data from the querystring values => products?keyword=
   // if keyword exists
@@ -19,12 +25,20 @@ const getProducts = asyncHandler(async (req, res) => {
         },
       }
     : {};
+  // get total count of products using count method, we might have a keyword passed so spread the keyword and send it
+  const count = await Product.countDocuments({ ...keyword });
+
   // if empty object is passed a search displays all products, but if specific keyword is passed it returns particular product
   //spread the keyword - either have name or empty object
-  const products = await Product.find({ ...keyword });
+  //we limit the number of products we are bringing using the pagesize
+  const products = await Product.find({ ...keyword })
+    .limit(pageSize)
+    // skip - .skip(1).limit(2)-If we want to fetch the two documents after the first document from the collection
+    .skip(pageSize * (page - 1));
   // //simulate error
   // throw new Error("simulated error!!!");
-  res.json(products);
+  //Math.ceil(.95)=>1
+  res.json({ products, page, pages: Math.ceil(count / pageSize) });
 });
 //@desc  Fetch single product
 //@route GET /api/products/:id

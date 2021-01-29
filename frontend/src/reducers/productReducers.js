@@ -30,7 +30,13 @@ export const productListReducer = (state = { products: [] }, action) => {
     //4-PRODUCT_LIST_SUCCESS is called in the productActions.js
     //data from payload is put into products
     case PRODUCT_LIST_SUCCESS:
-      return { loading: false, products: action.payload };
+      //in backend controller we are returning products, page, pages so we need to assign them separately
+      return {
+        loading: false,
+        products: action.payload.products,
+        pages: action.payload.pages,
+        page: action.payload.page,
+      };
     case PRODUCT_LIST_FAIL:
       return { loading: false, error: action.payload };
     default:
