@@ -20,7 +20,8 @@ import { PRODUCT_CREATE_REVIEW_RESET } from "../constants/productConstants";
 import Rating from "../components/Rating";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
-
+// import meta tag
+import Meta from "../components/Meta";
 // match A match object contains information about how a <Route path> matched the URL.
 const ProductScreen = ({ history, match }) => {
   // state hook
@@ -80,9 +81,11 @@ const ProductScreen = ({ history, match }) => {
         <Message variant="danger">{error}</Message>
       ) : (
         <>
+          {/* Meta tag after productloads we pass in product name in title */}
           <Row>
             <Col md={6}>
               <Image src={product.image} alt={product.name} fluid />
+              <Meta title={product.name} />
             </Col>
             <Col md={3}>
               {/* variant="flush" - removes the margin */}
