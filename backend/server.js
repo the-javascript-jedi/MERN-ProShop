@@ -28,9 +28,7 @@ if (process.env.NODE_ENV === "development") {
 }
 // this is used for reading the json data from body
 app.use(express.json());
-app.get("/", (req, res) => {
-  res.send("API is running.....");
-});
+
 // mount the product route
 app.use("/api/products", productRoutes);
 //mount the user routes
@@ -51,6 +49,21 @@ const __dirname = path.resolve();
 //  express.static(path.join(__dirname, "/uploads")) - takes to uploads folder and makes it static
 //from there we goto /uploads
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
+// make the /frontend/build folder as static
+if (process.env.NODE_ENV === "production") {
+  // set the build folder to a static folder
+  app.use(express.static(path.join(__dirname, "/frontend/build")));
+  // anything that is not our api routes will point to our index.html in build folder
+  app.get("*", (req, res) =>
+    // res.sendFile - transfer the file at the given path - point to index.html
+    res.sendFile(path.resolve(__dirname, "frontend", "build", "index.html"))
+  );
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is running.....");
+  });
+}
+
 // error message for anything that is not actually a route
 app.use(notFound);
 // wrong format of product id
