@@ -273,7 +273,7 @@ const OrderScreen = (props) => {
       </Row>
       <Row className="payment-info-row">
         <div>
-          <p>Use following PayPal Sandbox Account for placing order</p>
+          <p>Use following PayPal Sandbox Account for placing order:</p>
           <p>Email ID: sb-smamc4915926@business.example.com</p>
           <p>Password: p.B!x4Rk</p>
         </div>
