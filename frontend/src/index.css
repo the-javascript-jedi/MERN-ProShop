@@ -58,3 +58,9 @@ h2 {
     display: none;
   }
 }
+.payment-info-row {
+  justify-content: center;
+  color: red;
+  font-size: 20px;
+  text-align: center;
+}
